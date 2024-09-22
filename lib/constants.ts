@@ -1,4 +1,4 @@
-import { FiHome, FiSmartphone, FiUserPlus, FiGrid, FiBox, FiBriefcase, FiCalendar, FiUsers } from "react-icons/fi";
+import { FiHome, FiInfo, FiClipboard, FiPackage, FiUsers, FiMapPin, FiFile, FiGrid, FiBox, FiBriefcase, FiCalendar } from "react-icons/fi";
 
 export const menuItems = [
   {
@@ -7,14 +7,45 @@ export const menuItems = [
     href: "/",
     icon: FiHome,
   },
-  { id: 2, label: "Contact", href: "/contact", icon: FiSmartphone },
   {
-    id: 3,
+    id: 2,
     label: "About",
     href: "/about",
-    icon: FiUserPlus,
+    icon: FiInfo,
+  },
+  {
+    id: 3,
+    label: "Services",
+    href: "/services",
+    icon: FiClipboard,
+  },
+  {
+    id: 4,
+    label: "Packages",
+    href: "/packages",
+    icon: FiPackage,
+  },
+  {
+    id: 5,
+    label: "More",
+    href: "#", // Placeholder for dropdown
+    icon: FiFile,
+    dropdown: [
+      { label: "Destination", href: "/destination" },
+      { label: "Booking", href: "/booking" },
+      { label: "Travel Guides", href: "/team" },
+      { label: "Testimonial", href: "/testimonial" },
+      { label: "404 Page", href: "/404" },
+    ],
+  },
+  {
+    id: 6,
+    label: "Contact",
+    href: "/contact",
+    icon: FiMapPin,
   },
 ];
+
 
 export const dashboardMenu = [
   {

@@ -61,23 +61,29 @@ export const createTour = async (formData: FormData) => {
 };
 
 export const getAllTours = async () => {
+    await init(); // Ensure DB connection is initialized
     try {
         const allTours = await dbConnection.tour.findMany({
             include: {
-                category: true,  // Include related category information
+                category: true,
+                destination: true,  // Include related destination information
             },
             orderBy: {
                 createdAt: 'desc',
             },
         });
 
-        // Return the tours along with their categories
-        return allTours.map((tour: { category: { name: any; }; }) => ({
-            ...tour,
-            category: tour.category ? tour.category.name : null,  // Map the category to show only the name
+        return allTours.map((tour: any) => ({
+            id: tour.id,
+            title: tour.title,
+            description: tour.description,
+            price: tour.price,
+            image: tour.image,
+            category: tour.category ? { name: tour.category.name } : null,
+            destination: tour.destination ? { name: tour.destination.name } : null, // Ensure destination is included
         }));
     } catch (error: any) {
-        console.log("An error occurred while fetching tours and categories...", error.message);
+        console.error("An error occurred while fetching tours and categories:", error.message);
         return { error: error.message };
     }
 };

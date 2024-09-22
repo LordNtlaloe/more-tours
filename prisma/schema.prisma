@@ -28,8 +28,7 @@ model Category {
   id    Int    @id @default(autoincrement())
   name  String
   icon  String
-
-  tours Tour[] // One-to-many relationship (one category can have many tours)
+  tours Tour[]
 }
 
 model Destination {
@@ -37,7 +36,7 @@ model Destination {
   name        String
   description String
   image       String
-  tours       Tour[]    // One-to-many relationship (one destination can have many tours)
+  tours       Tour[]
 }
 
 model Tour {
@@ -46,20 +45,19 @@ model Tour {
   description    String
   price          Float
   image          String
-  categoryId     Int         // Foreign key for Category
-  category       Category    @relation(fields: [categoryId], references: [id]) // Many-to-one relationship
-  destinationId  Int         // Foreign key for Destination
-  destination    Destination @relation(fields: [destinationId], references: [id]) // Many-to-one relationship
+  categoryId     Int
+  category       Category    @relation(fields: [categoryId], references: [id])
+  destinationId  Int
+  destination    Destination @relation(fields: [destinationId], references: [id])
   availableSlots Int
   startDate      DateTime
   endDate        DateTime
   bookings       Booking[]
   reviews        Review[]
-  gallery        Gallery[]   // One-to-many relationship with Gallery
+  gallery        Gallery[]
   createdAt      DateTime    @default(now())
   updatedAt      DateTime    @updatedAt
-
-  Itinerary Itinerary[]
+  Itinerary      Itinerary[]
 }
 
 model Booking {
@@ -73,11 +71,10 @@ model Booking {
   totalPrice      Float
   payment         Payment?
   bookingDate     DateTime      @default(now())
-  dateBooked      DateTime?     // New field for the time slot booked
-  dateOfBooking   DateTime?     // New field for the time of the actual booking
+  dateBooked      DateTime?
+  dateOfBooking   DateTime?
 }
 
-// Enum for booking status
 enum BookingStatus {
   PENDING
   CONFIRMED
@@ -105,7 +102,7 @@ model Review {
   userId    Int
   tour      Tour     @relation(fields: [tourId], references: [id])
   tourId    Int
-  rating    Int      // Rating out of 5
+  rating    Int
   comment   String?
   createdAt DateTime @default(now())
 }
@@ -114,7 +111,7 @@ model Itinerary {
   id          Int    @id @default(autoincrement())
   tour        Tour   @relation(fields: [tourId], references: [id])
   tourId      Int
-  day         Int    // Day of the itinerary (1, 2, 3, etc.)
+  day         Int
   description String
 }
 

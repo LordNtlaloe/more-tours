@@ -13,6 +13,7 @@ import { FiMenu, FiUser } from "react-icons/fi";
 
 const Menu = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState<number | null>(null); // Specify the type here
 
   return (
     <div className="container mx-auto sm:px-4 max-w-full relative p-0">
@@ -31,45 +32,41 @@ const Menu = () => {
         <div className={`lg:flex flex-grow items-center ${isOpen ? "block" : "hidden"}`}>
           <div className="flex flex-wrap list-reset pl-0 mb-0 ms-auto py-0">
             {menuItems.map((item) => (
-              <Link
-                href={item.href}
-                key={item.label}
-                className="inline-block py-2 px-4 no-underline hover:text-blue-600"
-              >
-                {item.label}
-              </Link>
-            ))}
-
-            {/* Dropdown menu */}
-            <div className="relative">
-              <a
-                href="#"
-                className="inline-block py-2 px-4 no-underline border-b-0 border-t border-l border-r"
-              >
-                Pages
-              </a>
-              <div className="absolute left-0 z-50 hidden list-reset py-2 mt-1 text-base bg-white border border-gray-300 rounded">
-                <Link href="/destination" className="block w-full py-1 px-6">
-                  Destination
-                </Link>
-                <Link href="/booking" className="block w-full py-1 px-6">
-                  Booking
-                </Link>
-                <Link href="/team" className="block w-full py-1 px-6">
-                  Travel Guides
-                </Link>
-                <Link href="/testimonial" className="block w-full py-1 px-6">
-                  Testimonial
-                </Link>
-                <Link href="/404" className="block w-full py-1 px-6">
-                  404 Page
-                </Link>
+              <div key={item.id} className="relative">
+                {/* Check if the item has a dropdown */}
+                {item.dropdown ? (
+                  <>
+                    <button
+                      onClick={() => setDropdownOpen(dropdownOpen === item.id ? null : item.id)}
+                      className="inline-block py-2 px-4 no-underline hover:text-blue-600"
+                    >
+                      {item.label}
+                    </button>
+                    {/* Render dropdown items if open */}
+                    {dropdownOpen === item.id && (
+                      <div className="absolute left-0 z-10 mt-1 w-48 bg-white border border-gray-300 rounded shadow-lg">
+                        {item.dropdown.map((dropdownItem) => (
+                          <Link
+                            key={dropdownItem.label}
+                            href={dropdownItem.href}
+                            className="block py-2 px-4 no-underline hover:bg-gray-100"
+                          >
+                            {dropdownItem.label}
+                          </Link>
+                        ))}
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <Link
+                    href={item.href}
+                    className="inline-block py-2 px-4 no-underline hover:text-blue-600"
+                  >
+                    {item.label}
+                  </Link>
+                )}
               </div>
-            </div>
-
-            <Link href="/contact" className="inline-block py-2 px-4 no-underline">
-              Contact
-            </Link>
+            ))}
           </div>
         </div>
 

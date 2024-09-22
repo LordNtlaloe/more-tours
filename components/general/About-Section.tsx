@@ -8,43 +8,34 @@ const AboutSection = () => {
     return (
         <div className="container-xxl py-10 bg-white">
             <div className="container mx-auto px-4">
-                <div className="flex flex-row items-center gap-8">
+                <div className="flex flex-col lg:flex-row items-center gap-8">
                     <div className="lg:w-1/2 wow fadeInUp" data-wow-delay="0.1s" style={{ minHeight: '400px' }}>
-                        <div className="relative h-full rounded-lg overflow-hidden shadow-lg">
-                            <Image 
+                        <div className="relative h-full rounded-lg overflow-hidden shadow-lg transition-transform transform hover:scale-105">
+                            <Image
                                 src="/assets/img/about.jpg" // Ensure the path is correct
                                 alt="About Us"
-                                // layout="fill" 
-                                objectFit="cover" // Ensures the image covers the container without distortion
-                                quality={100} // Optional: for higher-quality images
-                                priority // Optional: to preload important images
+                                objectFit="cover"
+                                quality={100}
+                                priority
                                 width={650}
-                                height={150}
+                                height={400}
                             />
                         </div>
                     </div>
                     <div className="lg:w-1/2 wow fadeInUp" data-wow-delay="0.3s">
-                        <h6 className="text-blue-600 text-lg mb-3">About Us</h6>
-                        <h1 className="text-4xl font-bold mb-6">Welcome to <span className="text-blue-600">Tourist</span></h1>
-                        <p className="mb-6 text-gray-600">
-                            We offer amazing tours and services to help you explore the world with ease and comfort. 
-                            Discover fantastic destinations and enjoy first-class experiences.
+                        <h6 className="text-blue-600 text-lg mb-3 font-semibold">About Us</h6>
+                        <h1 className="text-4xl font-bold mb-6 text-gray-800">Welcome to <span className="text-blue-600">More Tours & Travel</span></h1>
+                        <p className="mb-6 text-gray-600 leading-relaxed">
+                            More Tours (Pty) Ltd Trading as More Tours as More Tours and Travel is a private Tour Operating Company. The company is 100% owned by two Basotho who are very patriotic and have massive interest in the Tourism Sector, they are very passionate and more interested in promoting The Kingdom of Lesotho and its Tourist attractions to the rest of the world still playing a major role in seeing to it that domestic tourism also grows as well as selling the Beauty and culture of other African Countries.
                         </p>
-                        <div className="grid sm:grid-cols-2 gap-4 mb-6">
-                            {[
-                                "First Class Flights",
-                                "Handpicked Hotels",
-                                "5 Star Accommodations",
-                                "Latest Model Vehicles",
-                                "150 Premium City Tours",
-                                "24/7 Service"
-                            ].map((item, index) => (
-                                <p key={index} className="flex items-center text-gray-700">
-                                    <FaArrowRight className="text-blue-600 mr-2" /> {item}
-                                </p>
-                            ))}
+                        <div className="gap-4 mb-6">
+                            <a
+                                href=""
+                                className="inline-block text-center bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg shadow transition duration-300 transform hover:bg-blue-700 hover:scale-105"
+                            >
+                                Read More
+                            </a>
                         </div>
-                        <a className="inline-block align-middle text-center border font-normal rounded py-3 px-6 bg-blue-600 text-white hover:bg-blue-700 transition-colors" href="#">Read More</a>
                     </div>
                 </div>
             </div>
