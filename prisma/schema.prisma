@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -38,25 +32,34 @@ model Category {
   tours Tour[] // One-to-many relationship (one category can have many tours)
 }
 
+model Destination {
+  id          Int       @id @default(autoincrement())
+  name        String
+  description String
+  image       String
+  tours       Tour[]    // One-to-many relationship (one destination can have many tours)
+}
+
 model Tour {
-  id             Int       @id @default(autoincrement())
+  id             Int         @id @default(autoincrement())
   title          String
   description    String
   price          Float
-  categoryId     Int       // Foreign key for Category
-  category       Category  @relation(fields: [categoryId], references: [id]) // Many-to-one relationship
-  destination    String
+  categoryId     Int         // Foreign key for Category
+  category       Category    @relation(fields: [categoryId], references: [id]) // Many-to-one relationship
+  destinationId  Int         // Foreign key for Destination
+  destination    Destination @relation(fields: [destinationId], references: [id]) // Many-to-one relationship
   availableSlots Int
   startDate      DateTime
   endDate        DateTime
   bookings       Booking[]
   reviews        Review[]
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
+  gallery        Gallery[]   // One-to-many relationship with Gallery
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
 
   Itinerary Itinerary[]
 }
-
 
 model Booking {
   id              Int           @id @default(autoincrement())
@@ -69,7 +72,7 @@ model Booking {
   totalPrice      Float
   payment         Payment?
   bookingDate     DateTime      @default(now())
-  dateBooked      DateTime?       // New field for the time slot booked
+  dateBooked      DateTime?     // New field for the time slot booked
   dateOfBooking   DateTime?     // New field for the time of the actual booking
 }
 
@@ -101,7 +104,7 @@ model Review {
   userId    Int
   tour      Tour     @relation(fields: [tourId], references: [id])
   tourId    Int
-  rating    Int // Rating out of 5
+  rating    Int      // Rating out of 5
   comment   String?
   createdAt DateTime @default(now())
 }
@@ -110,6 +113,13 @@ model Itinerary {
   id          Int    @id @default(autoincrement())
   tour        Tour   @relation(fields: [tourId], references: [id])
   tourId      Int
-  day         Int // Day of the itinerary (1, 2, 3, etc.)
+  day         Int    // Day of the itinerary (1, 2, 3, etc.)
   description String
+}
+
+model Gallery {
+  id      Int   @id @default(autoincrement())
+  image   String
+  tour    Tour  @relation(fields: [tourId], references: [id])
+  tourId  Int
 }
