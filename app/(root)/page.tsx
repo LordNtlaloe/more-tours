@@ -6,6 +6,7 @@ import HeroSection from '@/components/root/Hero';
 import AboutSection from '@/components/general/About-Section';
 import ServicesSection from '@/components/general/Services-Section';
 import DestinationsList from '@/components/destinations/DestinationsList';
+import CategoryCarousel from '@/components/categories/CategoriesCarousel';
 
 export default function Home() {
   return (
@@ -17,6 +18,7 @@ export default function Home() {
         <AboutSection/>
         <ServicesSection />
         <DestinationsList />
+        <CategoryCarousel />
       </div>
       <Footer />
     </div>

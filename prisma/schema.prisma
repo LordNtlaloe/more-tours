@@ -45,6 +45,7 @@ model Tour {
   title          String
   description    String
   price          Float
+  image          String
   categoryId     Int         // Foreign key for Category
   category       Category    @relation(fields: [categoryId], references: [id]) // Many-to-one relationship
   destinationId  Int         // Foreign key for Destination
