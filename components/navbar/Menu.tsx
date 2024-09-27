@@ -17,7 +17,7 @@ export default function Menu() {
 
     return (
         <div className="container mx-auto sm:px-4 max-w-full relative p-0">
-            <nav className="relative flex flex-wrap items-center justify-between py-3 px-4 text-black lg:px-12">
+            <nav className="relative flex flex-wrap items-center justify-between py-3 px-4 text-[#F2F2F2] lg:px-12">
 
                 {/* Mobile toggle button */}
                 <button
@@ -32,13 +32,13 @@ export default function Menu() {
                 <div className={`lg:flex flex-grow items-center ${isOpen ? "block" : "hidden"}`}>
                     <div className="flex flex-wrap list-reset pl-0 mb-0 ms-auto py-0">
                         {menuItems.map((item) => (
-                            <div key={item.id} className="relative text-white">
+                            <div key={item.id} className="relative">
                                 {/* Check if the item has a dropdown */}
                                 {item.dropdown ? (
                                     <>
                                         <button
                                             onClick={() => setDropdownOpen(dropdownOpen === item.id ? null : item.id)}
-                                            className="inline-block py-2 px-4 no-underline hover:text-blue-600"
+                                            className="inline-block py-2 px-4 no-underline hover:text-[#7FBF3F]"
                                         >
                                             {item.label}
                                         </button>
@@ -60,7 +60,7 @@ export default function Menu() {
                                 ) : (
                                     <Link
                                         href={item.href}
-                                        className="inline-block py-2 px-4 no-underline hover:text-blue-600"
+                                        className="inline-block py-2 px-4 no-underline hover:text-[#7FBF3F]"
                                     >
                                         {item.label}
                                     </Link>
@@ -73,7 +73,7 @@ export default function Menu() {
                 {/* User menu */}
                 <div className="relative ml-auto">
                     <button className="circle-icon" onClick={() => setIsOpen(!isOpen)}>
-                        <FiUser className="text-xl text-white" />
+                        <FiUser className="text-xl" />
                     </button>
                     <div className={`absolute right-0 mt-2 w-48 bg-white border border-gray-300 rounded-lg shadow-lg ${isOpen ? "block" : "hidden"}`}>
                         {/* <ul className="list-reset p-2">
