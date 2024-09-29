@@ -13,7 +13,7 @@ import {
 
 export default function SecondaryNav() {
     return (
-        <div className="bg-[#7FBF3F] px-10 hidden lg:block border-b border-slate-100 text-[#14141F]">
+        <div className="bg-[#7FBF3F] px-10 hidden lg:block text-[#14141F]">
             <div className="grid grid-cols-2 gap-0">
                 {/* Left Section with Contact Information */}
                 <div className="text-center lg:text-left mb-2 lg:mb-0">
