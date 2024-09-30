@@ -1,20 +1,16 @@
 "use client";
 import { menuItems } from "@/lib/constants";
 import Link from "next/link";
-// import {
-//   SignedIn,
-//   SignedOut,
-//   SignInButton,
-//   SignUpButton,
-//   UserButton,
-// } from "@clerk/nextjs";
+import { signIn, useSession } from 'next-auth/react';
 import React, { useState } from "react";
 import { FiMenu, FiUser } from "react-icons/fi";
+import UserButton from "../general/UserButton";
 
 export default function Menu() {
     const [isOpen, setIsOpen] = useState(false);
     const [dropdownOpen, setDropdownOpen] = useState<number | null>(null); // Specify the type here
-
+    const session = useSession();
+    const user = session.data?.user; 
     return (
         <div className="container mx-auto sm:px-4 max-w-full relative p-0">
             <nav className="relative flex flex-wrap items-center justify-between py-3 px-1 text-[#F2F2F2] lg:px-6">
@@ -73,35 +69,22 @@ export default function Menu() {
                             <FiUser className="text-xl" />
                         </button>
                         <div className={`absolute right-0 mt-2 w-48 bg-white border border-gray-300 rounded-lg shadow-lg ${isOpen ? "block" : "hidden"}`}>
-                            {/* <ul className="list-reset p-2">
-                            <SignedIn>
-                                <li className="py-1 px-4 hover:bg-gray-100">
-                                    <Link href="/dashboard">
-                                        Dashboard
-                                    </Link>
+                            <ul className="list-reset p-2">
+                                <li>
+                                    {user && <UserButton user={user} />}
+                                    {!user && session.status !== "loading" && <SignInButton />}
                                 </li>
-                                <li className="py-1 px-4 hover:bg-gray-100">
-                                    <UserButton afterSignOutUrl="/" />
-                                </li>
-                            </SignedIn>
-                            <SignedOut>
-                                <li className="py-1 px-4 hover:bg-gray-100">
-                                    <SignUpButton>
-                                        <Link href="/register">Register</Link>
-                                    </SignUpButton>
-                                </li>
-                                <li className="py-1 px-4 hover:bg-gray-100">
-                                    <SignInButton>
-                                        <Link href="/login">Login</Link>
-                                    </SignInButton>
-                                </li>
-                            </SignedOut>
-                        </ul> */}
+                            </ul>
                         </div>
                     </div>
                 </div>
             </nav>
         </div>
 
+    )
+}
+function SignInButton() {
+    return (
+        <button onClick={() => signIn()} type="submit">Sign In</button>
     )
 }

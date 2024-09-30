@@ -1,3 +1,4 @@
+import AboutSection from "@/components/about-section/AboutSection";
 import Footer from "@/components/footer/Footer";
 import Hero from "@/components/hero/Hero";
 import LandingPage from "@/components/hero/Hero";
@@ -13,6 +14,7 @@ export default function Home() {
         <SecondaryNav />
       </div>
       <Hero />
+      <AboutSection />
       <Footer />
     </div>
 
