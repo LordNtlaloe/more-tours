@@ -1,7 +1,7 @@
-// middleware.ts
+export { auth as middleware } from "@/auth"
 import { NextRequest, NextResponse } from 'next/server';
 
-export function middleware(req: NextRequest) {
+export function auth(req: NextRequest) {
     // Example: Log the request URL
     console.log('Request URL:', req.url);
 
