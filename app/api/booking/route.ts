@@ -8,7 +8,8 @@ interface ReservationBody {
     startDate: string | Date;
     endDate: string | Date;
     listingId: string;
-    daysDifference: number; // Assuming this is a number
+    daysDifference: number; 
+    chargeId: string; // Added chargeId
 }
 
 export async function GET(req: Request) {
@@ -22,15 +23,15 @@ export async function GET(req: Request) {
         const db = await connectToDB();
 
         const allReservations = currentUser.role ? 
-            await db.reservation.findMany({ include: { listing: true } }) :
+            await db.reservation.findMany({ include: { listing: true, reservedDates: true } }) : // Include reservedDates
             await db.reservation.findMany({
                 where: { userId: currentUser.id },
-                include: { listing: true },
+                include: { listing: true, reservedDates: true }, // Include reservedDates
             });
 
         return NextResponse.json(allReservations);
     } catch (error) {
-        console.error(error); // Log the error for debugging
+        console.error(error);
         return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
     }
 }
@@ -45,11 +46,11 @@ export async function POST(req: Request) {
 
         const body: ReservationBody = await req.json();
         const db = await connectToDB();
-        const { startDate, endDate, listingId, daysDifference } = body;
+        const { startDate, endDate, listingId, daysDifference, chargeId } = body;
 
         const listing = await db.listing.findUnique({
             where: { id: listingId },
-            include: { reservations: true },
+            include: { reservations: { include: { reservedDates: true } } }, // Include reservedDates
         });
 
         if (!listing) {
@@ -75,6 +76,7 @@ export async function POST(req: Request) {
                 endDate,
                 listingId,
                 daysDifference,
+                chargeId, // Include chargeId
                 userId: currentUser.id,
             },
         });
@@ -82,7 +84,7 @@ export async function POST(req: Request) {
         // Create reserved dates entries
         const reservedDateEntries = getDates.map(date => ({
             date,
-            reservationId: newReservation.id
+            reservationId: newReservation.id,
         }));
 
         await db.reservedDate.createMany({
@@ -91,7 +93,7 @@ export async function POST(req: Request) {
 
         return NextResponse.json(newReservation);
     } catch (error) {
-        console.error(error); // Log the error for debugging
+        console.error(error);
         return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
     }
 }

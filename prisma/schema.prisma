@@ -97,31 +97,30 @@ model Reservation {
   id             String         @id @default(cuid())
   startDate      DateTime
   endDate        DateTime
-  chargeId       String
+  chargeId       String         // Make sure this is defined
   daysDifference Int
+  listingId      String
+  userId         String
 
-  listingId String
-  userId    String
-
-  listing      Listing      @relation(fields: [listingId], references: [id], onDelete: Cascade)
-  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  reservedDates ReservedDate[] // Establish a one-to-many relationship
+  listing        Listing      @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reservedDates  ReservedDate[] // Establish a one-to-many relationship
 
   createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@map("reservations")
 }
 
 model ReservedDate {
   id             String       @id @default(cuid())
-  date           Int          // Store dates as integers (or adjust as needed)
+  date           Int          // Assuming this is a date representation
   reservationId  String
 
-  reservation Reservation @relation(fields: [reservationId], references: [id], onDelete: Cascade)
+  reservation    Reservation  @relation(fields: [reservationId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@map("reserved_dates")
 }
@@ -136,7 +135,7 @@ model Review {
   userId    String
 
   createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   listing Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
   user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
