@@ -74,7 +74,7 @@ model VerificationToken {
 }
 
 model Listing {
-  id            String  @id @default(cuid())
+  id            String     @id @default(cuid())
   name          String
   location      String
   type          String
@@ -82,16 +82,32 @@ model Listing {
   pricePerNight Float
   beds          Int
   hasFreeWifi   Boolean
-  imageUrls     String
 
-  reviews      Review[]
-  reservations Reservation[]
+  images        Image[]    // Create a one-to-many relation with the Image model
+
+  reviews       Review[]
+  reservations  Reservation[]
+
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  @@map("listings")
+}
+
+model Image {
+  id        String   @id @default(cuid())
+  url       String   // Store the image URL
+  blurred   String?  // Optional blurred image version
+  listingId String   // Foreign key to the Listing
+
+  listing   Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@map("listings")
+  @@map("images")
 }
+
 
 model Reservation {
   id             String         @id @default(cuid())

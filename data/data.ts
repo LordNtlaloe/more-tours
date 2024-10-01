@@ -1,11 +1,11 @@
-import Delhi from '../../public/assets/delhi.jpg'
-import Dubai from '../../public/assets/dubai.jpg'
-import Berlin from '../../public/assets/berlin.jpg'
-import Paris from '../../public/assets/paris.jpg'
-import AbuDhabi from '../../public/assets/AbuDhabi.jpg'
-import Mumbai from '../../public/assets/Mumbai.jpg'
-import Hamburg from '../../public/assets/Hamburg.jpg'
-import StTropez from '../../public/assets/StTropez.jpg'
+import Delhi from '@/public/assets/img/tour/tour_2_1.jpg'
+import Dubai from '@/public/assets/img/tour/tour_2_2.jpg'
+import Berlin from '@/public/assets/img/tour/tour_2_3.jpg'
+import Paris from '@/public/assets/img/tour/tour_2_4.jpg'
+import AbuDhabi from '@/public/assets/img/gallery/gallery_2_1.jpg'
+import Mumbai from '@/public/assets/img/gallery/gallery_2_2.jpg'
+import Hamburg from '@/public/assets/img/gallery/gallery_2_3.jpg'
+import StTropez from '@/public/assets/img/gallery/gallery_2_4.jpg'
 
 export const popularCities = [
     {

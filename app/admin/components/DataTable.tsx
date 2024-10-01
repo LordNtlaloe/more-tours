@@ -1,5 +1,4 @@
-"use client"
-
+import React, { useState } from "react";
 import {
     flexRender,
     getCoreRowModel,
@@ -7,8 +6,7 @@ import {
     getSortedRowModel,
     SortingState,
     useReactTable,
-} from "@tanstack/react-table"
-
+} from "@tanstack/react-table";
 import {
     Table,
     TableBody,
@@ -16,17 +14,15 @@ import {
     TableHead,
     TableHeader,
     TableRow,
-} from "@/components/ui/table"
-import React, { useState } from "react"
+} from "@/components/ui/table";
 
-// Define the props type for columns and data
 interface DataTableProps<TData> {
-    columns: any; // You can type this more strictly based on your column definition
+    columns: any; // Adjust this to your column type definition
     data: TData[];
 }
 
 export function DataTable<TData>({ columns, data }: DataTableProps<TData>) {
-    const [sorting, setSorting] = useState<SortingState>([]); // Correctly type sorting state
+    const [sorting, setSorting] = useState<SortingState>([]);
 
     const table = useReactTable({
         data,
@@ -36,9 +32,13 @@ export function DataTable<TData>({ columns, data }: DataTableProps<TData>) {
         onSortingChange: setSorting,
         getSortedRowModel: getSortedRowModel(),
         state: {
-            sorting
-        }
+            sorting,
+        },
     });
+
+    if (!data || data.length === 0) {
+        return <div>No data available.</div>;
+    }
 
     return (
         <div className="w-full rounded-md border">
@@ -46,28 +46,20 @@ export function DataTable<TData>({ columns, data }: DataTableProps<TData>) {
                 <TableHeader>
                     {table.getHeaderGroups().map((headerGroup) => (
                         <TableRow key={headerGroup.id}>
-                            {headerGroup.headers.map((header) => {
-                                return (
-                                    <TableHead key={header.id}>
-                                        {header.isPlaceholder
-                                            ? null
-                                            : flexRender(
-                                                header.column.columnDef.header,
-                                                header.getContext()
-                                            )}
-                                    </TableHead>
-                                )
-                            })}
+                            {headerGroup.headers.map((header) => (
+                                <TableHead key={header.id}>
+                                    {header.isPlaceholder
+                                        ? null
+                                        : flexRender(header.column.columnDef.header, header.getContext())}
+                                </TableHead>
+                            ))}
                         </TableRow>
                     ))}
                 </TableHeader>
                 <TableBody>
-                    {table.getRowModel().rows?.length ? (
+                    {table.getRowModel().rows.length ? (
                         table.getRowModel().rows.map((row) => (
-                            <TableRow
-                                key={row.id}
-                                data-state={row.getIsSelected() && "selected"}
-                            >
+                            <TableRow key={row.id}>
                                 {row.getVisibleCells().map((cell) => (
                                     <TableCell key={cell.id}>
                                         {flexRender(cell.column.columnDef.cell, cell.getContext())}
@@ -95,7 +87,7 @@ export function DataTable<TData>({ columns, data }: DataTableProps<TData>) {
                 <button
                     className="text-slate-500 transition hover:text-slate-400"
                     onClick={() => table.nextPage()}
-                    disabled={!table.getCanNextPage()}
+                    disabled={!table.getCanNextPage()} // Safeguard added here
                 >
                     Next
                 </button>
