@@ -1,4 +1,7 @@
-import { FiHome, FiInfo, FiClipboard, FiPackage, FiUsers, FiMapPin, FiFile, FiGrid, FiBox, FiBriefcase, FiCalendar } from "react-icons/fi";
+import { FiHome, FiInfo, FiClipboard, FiPackage, FiUsers, FiMapPin, FiFile, FiGrid, FiBox, FiBriefcase, FiCalendar, FiSettings } from "react-icons/fi";
+import { AiOutlineCalendar, AiOutlineUserAdd, AiOutlineTable } from "react-icons/ai";
+import { MdGridView } from "react-icons/md";
+import { FaTools, FaUserCircle } from "react-icons/fa";
 
 export const menuItems = [
   {
@@ -49,38 +52,43 @@ export const menuItems = [
 
 export const dashboardMenu = [
   {
-    id: 1,
+    icon: MdGridView,
     label: "Dashboard",
-    href: "/dashboard",
-    icon: FiGrid,
-    color: 'text-sky-500'
+    route: "#",
+    children: [{ label: "eCommerce", route: "/" }],
   },
   {
-    id: 2,
-    label: "Businesses",
-    href: "/dashboard/businesses",
-    icon: FiBriefcase,
-    color: '#39F4B3'
+    icon: AiOutlineCalendar,
+    label: "Calendar",
+    route: "/calendar",
   },
   {
-    id: 3,
-    label: "Category",
-    href: "/dashboard/categories",
-    icon: FiBox,
-    color: 'text-sky-500'
+    icon: FaUserCircle,
+    label: "Profile",
+    route: "/profile",
   },
   {
-    id: 4,
-    label: "Bookings",
-    href: "/dashboard/bookings",
-    icon: FiCalendar,
-    color: '#39F4B3'
+    icon: AiOutlineUserAdd,
+    label: "Forms",
+    route: "#",
+    children: [
+      { label: "Form Elements", route: "/forms/form-elements" },
+      { label: "Form Layout", route: "/forms/form-layout" },
+    ],
   },
   {
-    id: 5,
-    label: "Users",
-    href: "/dashboard/users",
-    icon: FiUsers,
-    color: '#39F4B3'
+    icon: AiOutlineTable,
+    label: "Tables",
+    route: "/tables",
   },
-];
+  {
+    icon: FaTools,
+    label: "Tools",
+    route: "/tools",
+  },
+  {
+    icon: FiSettings,
+    label: "Settings",
+    route: "/settings",
+  },
+]
