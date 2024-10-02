@@ -20,7 +20,7 @@ const MobileMenu = () => {
                     <FaBars className="text-xl" />
                 </SheetTrigger>
                 <SheetContent
-                    className="bg-[#14141F] h-full text-[#F2F2F2] w-72 p-6"
+                    className="bg-[#1C2434] h-full text-[#F2F2F2] w-72 p-6"
                     side="left"
                 >
                     <SheetHeader>

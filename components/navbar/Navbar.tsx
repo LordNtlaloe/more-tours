@@ -10,7 +10,7 @@ export default function Navbar() {
     const [searchTerm, setSearchTerm] = useState("");
 
     return (
-        <main className="w-full bg-[#14141F] h-20 text-[#F2F2F2] flex items-center justify-between px-10 sticky top-0 left-0 right-0 z-10">
+        <main className="w-full bg-[#1C2434] h-20 text-[#F2F2F2] flex items-center justify-between px-10 sticky top-0 left-0 right-0 z-10">
             {/* Logo */}
             <Link href='/' className="flex-shrink-0">
                 <Image src="/logo.png" width={80} height={80} alt="More Tours And Travel Logo" className="rounded-[5px]" />
