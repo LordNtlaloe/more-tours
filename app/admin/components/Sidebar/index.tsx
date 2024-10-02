@@ -1,60 +1,92 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { MdDashboard, MdHotel } from "react-icons/md";
-import { AiOutlineUser, AiFillStar, AiOutlineHome, AiOutlineArrowLeft } from "react-icons/ai";
-import ClickOutside from "@/app/admin/components/ClickOutside"; // Assuming this component exists
+import SidebarItem from "./SidebarItem";
+import ClickOutside from "@/app/admin/components/ClickOutside";
+import useLocalStorage from "@/app/admin/hooks/useLocalStorage";
+import { AiOutlineCalendar, AiOutlineUserAdd, AiOutlineTable, AiOutlineArrowLeft } from "react-icons/ai";
+import { FaUserCircle, FaTools } from "react-icons/fa";
+import { FiSettings } from "react-icons/fi";
+import { MdGridView } from "react-icons/md";
+import logo from "@/public/logo.png"
 
-const Sidebar = () => {
-  const [sidebarOpen, setSidebarOpen] = useState(false); // Local state for sidebar
-  const currentPage = usePathname().split("/")[2];
+interface SidebarProps {
+  sidebarOpen: boolean;
+  setSidebarOpen: (arg: boolean) => void;
+}
 
-  const sidebarData = [
-    {
-      text: "Dashboard",
-      icon: <MdDashboard size={18} />,
-      href: "/admin/dashboard",
-      isCurrentPage: currentPage === "dashboard",
-    },
-    {
-      text: "Users",
-      icon: <AiOutlineUser size={18} />,
-      href: "/admin/users",
-      isCurrentPage: currentPage === "users",
-    },
-    {
-      text: "Listings",
-      icon: <MdHotel size={18} />,
-      href: "/admin/listings",
-      isCurrentPage: currentPage === "listings",
-    },
-    {
-      text: "Reservations",
-      icon: <AiOutlineHome size={18} />,
-      href: "/admin/reservations",
-      isCurrentPage: currentPage === "reservations",
-    },
-    {
-      text: "Reviews",
-      icon: <AiFillStar size={18} />,
-      href: "/admin/reviews",
-      isCurrentPage: currentPage === "reviews",
-    },
-  ];
+const menuGroups = [
+  {
+    name: "MENU",
+    menuItems: [
+      {
+        icon: <MdGridView className="fill-current" size={18} />,
+        label: "Dashboard",
+        route: "#",
+        children: [{ label: "eCommerce", route: "/" }],
+      },
+      {
+        icon: <AiOutlineCalendar className="fill-current" size={18} />,
+        label: "Calendar",
+        route: "/calendar",
+      },
+      {
+        icon: <FaUserCircle className="fill-current" size={18} />,
+        label: "Profile",
+        route: "/profile",
+      },
+      {
+        icon: <AiOutlineUserAdd className="fill-current" size={18} />,
+        label: "Forms",
+        route: "#",
+        children: [
+          { label: "Form Elements", route: "/forms/form-elements" },
+          { label: "Form Layout", route: "/forms/form-layout" },
+        ],
+      },
+      {
+        icon: <AiOutlineTable className="fill-current" size={18} />,
+        label: "Tables",
+        route: "/tables",
+      },
+      {
+        icon: <FaTools className="fill-current" size={18} />,
+        label: "Tools",
+        route: "/tools",
+      },
+      {
+        icon: <FiSettings className="fill-current" size={18} />,
+        label: "Settings",
+        route: "/settings",
+      },
+    ],
+  },
+];
+
+const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
+  const pathname = usePathname();
+  const [pageName, setPageName] = useLocalStorage("selectedMenu", "dashboard");
 
   return (
     <ClickOutside onClick={() => setSidebarOpen(false)}>
       <aside
-        className={`fixed left-0 top-0 z-50 h-screen w-72 flex flex-col bg-black transition-transform duration-300 ${
+        className={`fixed left-0 top-0 z-9999 flex h-screen w-72.5 flex-col overflow-y-hidden bg-[#1C2434] duration-300 ease-linear dark:bg-boxdark lg:translate-x-0 ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
-        <div className="flex items-center justify-between px-6 py-6">
+        {/* <!-- SIDEBAR HEADER --> */}
+        <div className="flex items-center justify-between gap-2 px-6 py-5.5 lg:py-6.5">
           <Link href="/">
-            <Image src="/images/logo/logo.svg" width={176} height={32} alt="Logo" priority />
+            <Image
+              width={76}
+              height={32}
+              src={logo}
+              alt="Logo"
+              priority
+            />
           </Link>
 
           <button
@@ -62,24 +94,36 @@ const Sidebar = () => {
             aria-controls="sidebar"
             className="block lg:hidden"
           >
-            <AiOutlineArrowLeft size={20} className="text-white" />
+                <AiOutlineArrowLeft className="fill-current" size={20} />
+
           </button>
         </div>
+        {/* <!-- SIDEBAR HEADER --> */}
 
-        <nav className="mt-5 px-4">
-          {sidebarData.map((item) => (
-            <Link
-              key={item.text}
-              href={item.href}
-              className={`flex items-center gap-4 px-4 py-3 rounded-lg transition-colors ${
-                item.isCurrentPage ? "bg-blue-600 text-white" : "text-gray-400"
-              }`}
-            >
-              <span>{item.icon}</span>
-              <span>{item.text}</span>
-            </Link>
-          ))}
-        </nav>
+        <div className="no-scrollbar flex flex-col overflow-y-auto duration-300 ease-linear">
+          {/* <!-- Sidebar Menu --> */}
+          <nav className="mt-5 px-4 py-4 lg:mt-9 lg:px-6">
+            {menuGroups.map((group, groupIndex) => (
+              <div key={groupIndex}>
+                <h3 className="mb-4 ml-4 text-sm font-semibold text-bodydark2">
+                  {group.name}
+                </h3>
+
+                <ul className="mb-6 flex flex-col gap-1.5">
+                  {group.menuItems.map((menuItem, menuIndex) => (
+                    <SidebarItem
+                      key={menuIndex}
+                      item={menuItem}
+                      pageName={pageName}
+                      setPageName={setPageName}
+                    />
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </nav>
+          {/* <!-- Sidebar Menu --> */}
+        </div>
       </aside>
     </ClickOutside>
   );

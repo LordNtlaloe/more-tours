@@ -1,21 +1,42 @@
-import React from 'react'
-import Navbar from '../components/Navbar'
-import Sidebar from '@/app/admin/components/Sidebar/index';
+"use client";
+import React, { useState, ReactNode } from "react";
+import Sidebar from "@/app/admin/components/Sidebar/index";
+import Header from "@/app/admin/components/Header/index";
+import "@/app/admin/css/satoshi.css"
+import "@/app/admin/css/style.css"
 
-const AdminLayout = ({
-    children
-}) => {
-    return (
-        <div className="h-full w-full overflow-hidden bg-slate-100">
-            <div className="h-full w-full px-10 py-6">
-                <Navbar />
-                <div className="h-full w-full mt-8 mx-auto grid grid-cols-8 gap-12">
-                    <Sidebar />
-                    {children}
-                </div>
+
+export default function AdminLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  return (
+    <>
+      {/* <!-- ===== Page Wrapper Start ===== --> */}
+      <div className="flex">
+        {/* <!-- ===== Sidebar Start ===== --> */}
+        <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
+        {/* <!-- ===== Sidebar End ===== --> */}
+
+        {/* <!-- ===== Content Area Start ===== --> */}
+        <div className="relative flex flex-1 flex-col lg:ml-72.5">
+          {/* <!-- ===== Header Start ===== --> */}
+          <Header sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
+          {/* <!-- ===== Header End ===== --> */}
+
+          {/* <!-- ===== Main Content Start ===== --> */}
+          <main>
+            <div className="mx-auto max-w-screen-2xl p-4 md:p-6 2xl:p-10">
+              {children}
             </div>
+          </main>
+          {/* <!-- ===== Main Content End ===== --> */}
         </div>
-    )
+        {/* <!-- ===== Content Area End ===== --> */}
+      </div>
+      {/* <!-- ===== Page Wrapper End ===== --> */}
+    </>
+  );
 }
-
-export default AdminLayout
