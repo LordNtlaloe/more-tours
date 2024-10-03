@@ -7,6 +7,9 @@ import { useWidgetHook } from '../../hooks/widget-hook';
 import Widget from '../../components/Widget';
 import BigWidget from '../../components/BigWidget';
 import Chart from '../../components/Chart/page';
+import ChartOne from '../../components/Chart/ChartOne';
+import ChartThree from '../../components/Chart/ChartThree';
+import ChartTwo from '../../components/Chart/ChartTwo';
 
 const Dashboard = () => {
   const [
@@ -42,7 +45,7 @@ const Dashboard = () => {
 
   return (
     <AdminLayout>
-      
+
       <div className="ml-2 w-full h-full flex flex-col col-span-7 overflow-hidden">
         <div className="grid grid-cols-4 gap-8">
           {widgetData.map(({ page, data, icon }) => (
@@ -55,12 +58,15 @@ const Dashboard = () => {
           ))}
         </div>
         <div className="mt-28 grid grid-cols-7 gap-16">
-          <BigWidget 
+          <BigWidget
             listing={mostReservedQuery.data || {}} // Same here
           />
-          
-          <Chart />
         </div>
+      </div>
+      <div className="mt-4 grid grid-cols-12 gap-4 md:mt-6 md:gap-6 2xl:mt-7.5 2xl:gap-7.5">
+        <ChartOne />
+        <ChartTwo />
+        <ChartThree />
       </div>
     </AdminLayout>
   );

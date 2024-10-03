@@ -9,21 +9,21 @@ export async function GET(req) {
         // Ensure connectToDB returns a Prisma client instance
         const prisma = await connectToDB();
 
-        const getAllReservations = await prisma.reservation.findMany({
+        const getAllBookings = await prisma.reservation.findMany({
             include: {
                 listing: true,
                 user: true
             }
         });
 
-        const allReservationsTotalPrice = getAllReservations.map((reservation) => {
+        const allBookingsTotalPrice = getAllBookings.map((reservation) => {
             return {
                 ...reservation,
                 totalPrice: reservation.daysDifference * reservation.listing.pricePerNight
             };
         });
 
-        return NextResponse.json(allReservationsTotalPrice);
+        return NextResponse.json(allBookingsTotalPrice);
     } catch (error) {
         return NextResponse.error();
     }

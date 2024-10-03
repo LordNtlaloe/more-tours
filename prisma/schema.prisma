@@ -4,20 +4,21 @@ datasource db {
 }
 
 generator client {
-  provider = "prisma-client-js"
+  provider   = "prisma-client-js"
+  engineType = "accelerate"
 }
 
 model User {
-  id            String        @id @default(cuid())
+  id            String    @id @default(cuid())
   name          String?
-  username      String?       @unique
-  email         String?       @unique
+  username      String?   @unique
+  email         String?   @unique
   emailVerified DateTime?
   image         String?
   role          String?
   accounts      Account[]
   sessions      Session[]
-  reservations  Reservation[]
+  bookings      Booking[]
   reviews       Review[]
 
   createdAt DateTime @default(now())
@@ -74,7 +75,7 @@ model VerificationToken {
 }
 
 model Listing {
-  id            String     @id @default(cuid())
+  id            String  @id @default(cuid())
   name          String
   location      String
   type          String
@@ -83,24 +84,24 @@ model Listing {
   beds          Int
   hasFreeWifi   Boolean
 
-  images        Image[]    // Create a one-to-many relation with the Image model
+  images Image[] // Create a one-to-many relation with the Image model
 
-  reviews       Review[]
-  reservations  Reservation[]
+  reviews  Review[]
+  bookings Booking[]
 
-  createdAt     DateTime   @default(now())
-  updatedAt     DateTime   @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@map("listings")
 }
 
 model Image {
-  id        String   @id @default(cuid())
-  url       String   // Store the image URL
-  blurred   String?  // Optional blurred image version
-  listingId String   // Foreign key to the Listing
+  id        String  @id @default(cuid())
+  url       String // Store the image URL
+  blurred   String? // Optional blurred image version
+  listingId String // Foreign key to the Listing
 
-  listing   Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  listing Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -108,32 +109,31 @@ model Image {
   @@map("images")
 }
 
-
-model Reservation {
-  id             String         @id @default(cuid())
+model Booking {
+  id             String   @id @default(cuid())
   startDate      DateTime
   endDate        DateTime
-  chargeId       String         // Make sure this is defined
+  chargeId       String // Make sure this is defined
   daysDifference Int
   listingId      String
   userId         String
 
-  listing        Listing      @relation(fields: [listingId], references: [id], onDelete: Cascade)
-  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  reservedDates  ReservedDate[] // Establish a one-to-many relationship
+  listing       Listing        @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reservedDates ReservedDate[] // Establish a one-to-many relationship
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@map("reservations")
+  @@map("bookings")
 }
 
 model ReservedDate {
-  id             String       @id @default(cuid())
-  date           Int          // Assuming this is a date representation
-  reservationId  String
+  id        String @id @default(cuid())
+  date      Int // Assuming this is a date representation
+  bookingId String
 
-  reservation    Reservation  @relation(fields: [reservationId], references: [id], onDelete: Cascade)
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
