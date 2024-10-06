@@ -1,49 +1,37 @@
-import { useQueries } from "@tanstack/react-query";
-import { getMostReservedListings } from "../modals/create-modal/service"
+import { useQueries } from '@tanstack/react-query';
+import { getMostReservedListings } from '../modals/create-modal/service';
 import {
     getAllListings,
-    getAllReservations,
+    getAllBookings,
     getAllRevenue,
     getAllUsers
-} from "../services/service"
+} from '../services/service';
 
 export const useWidgetHook = () => {
-    const [
-        usersQuery,
-        listingsQuery,
-        reservationsQuery,
-        revenueQuery,
-        mostReservedQuery
-    ] = useQueries({
+    const queries = useQueries({
         queries: [
             {
                 queryFn: getAllUsers,
-                queryKey: ["admin", "users"]
+                queryKey: ['admin', 'users']
             },
             {
                 queryFn: getAllListings,
-                queryKey: ["admin", "listings"]
+                queryKey: ['admin', 'listings']
             },
             {
-                queryFn: getAllReservations,
-                queryKey: ["admin", "reservations"]
+                queryFn: getAllBookings,
+                queryKey: ['admin', 'bookings']
             },
             {
                 queryFn: getAllRevenue,
-                queryKey: ["admin", "revenue"]
+                queryKey: ['admin', 'revenue']
             },
             {
                 queryFn: getMostReservedListings,
-                queryKey: ["admin", "most-reserved-listing"]
+                queryKey: ['admin', 'most-reserved-listing']
             },
         ]
-    })
+    });
 
-    return [
-        usersQuery,
-        listingsQuery,
-        reservationsQuery,
-        revenueQuery,
-        mostReservedQuery
-    ]
+    return queries;
 }

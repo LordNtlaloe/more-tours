@@ -6,14 +6,14 @@ export async function getAllListings() {
     return data
 }
 
-export async function getAllReservations() {
-    const { data } = await AXIOS_API.get('/admin/reservation/get-all-reservations')
+export async function getAllBookings() {
+    const { data } = await AXIOS_API.get('/admin/booking/get-all-bookings')
 
     return data
 }
 
 export async function getAllRevenue() {
-    const { data } = await AXIOS_API.get('/admin/reservation/get-all-revenue')
+    const { data } = await AXIOS_API.get('/admin/booking/get-all-revenue')
 
     return data
 }

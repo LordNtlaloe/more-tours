@@ -1,3 +1,4 @@
+import '@prisma/accelerate';
 import { getCurrentUser } from "./currentUser";
 import { NextResponse } from "next/server";
 

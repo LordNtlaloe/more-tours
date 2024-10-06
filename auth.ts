@@ -1,3 +1,4 @@
+export const runtime = 'nodejs';
 import NextAuth from "next-auth"
 import { PrismaAdapter } from "@auth/prisma-adapter"
 import Google from "next-auth/providers/google"
@@ -8,14 +9,14 @@ import { PrismaClient } from "@prisma/client"
 const prisma = new PrismaClient();
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
-  
+
   trustHost: true,
-  theme:{
+  theme: {
     logo: '/logo.png'
   },
   adapter: PrismaAdapter(prisma) as Adapter,
-  callbacks:{
-    session({session, user}){
+  callbacks: {
+    session({ session, user }) {
       session.user.role = user.role;
       return session;
     }
@@ -24,6 +25,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     Resend({
       from: "ntlal0e182@gmail.com"
     }),
-    Google
+    Google({
+      clientId: process.env.AUTH_GOOGLE_ID,
+      clientSecret: process.env.AUTH_GOOGLE_SECRET,
+    })
   ],
 })

@@ -1,7 +1,6 @@
 import { connectToDB } from "@/lib/database";
 import isAdminUser from "@/lib/isAdminUser";
-import { NextResponse } from "next/server";
-import { NextRequest, NextResponse as NextApiResponse } from "next/server"; // Import types
+import { NextRequest, NextResponse } from "next/server";
 
 // Type for context (ctx) with params
 type Context = {
@@ -11,28 +10,31 @@ type Context = {
 };
 
 // GET Request
-export async function GET(req: NextRequest, ctx: Context) {
+export async function GET(req: NextRequest, { params }: Context) {
   try {
     await isAdminUser();
     const db = await connectToDB();
-    const { id } = ctx.params;
+    const { id } = params;
 
     const listing = await db.listing.findUnique({
       where: { id },
     });
 
-    return NextApiResponse.json(listing);
+    if (!listing) {
+      return NextResponse.json({ error: `Listing with id ${id} not found` }, { status: 404 });
+    }
+
+    return NextResponse.json(listing);
   } catch (error: any) {
-    return NextApiResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
 
 // PUT Request
-export async function PUT(req: NextRequest, ctx: Context) {
+export async function PUT(req: NextRequest, { params }: Context) {
   try {
     await isAdminUser();
-
-    const { id } = ctx.params;
+    const { id } = params;
     const body = await req.json();
 
     const db = await connectToDB();
@@ -41,35 +43,28 @@ export async function PUT(req: NextRequest, ctx: Context) {
       data: { ...body },
     });
 
-    return NextApiResponse.json(updatedListing);
+    return NextResponse.json(updatedListing);
   } catch (error: any) {
-    return NextApiResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
 
 // DELETE Request
-export async function DELETE(req: NextRequest, ctx: Context) {
+export async function DELETE(req: NextRequest, { params }: Context) {
   try {
     await isAdminUser();
     const db = await connectToDB();
-    const { id } = ctx.params;
+    const { id } = params;
 
     const deletedListing = await db.listing.delete({
       where: { id },
     });
 
-    if (deletedListing) {
-      return NextApiResponse.json(
-        { message: "Listing has been deleted successfully" },
-        { status: 200 }
-      );
-    } else {
-      return NextApiResponse.json(
-        { error: `Listing with the id of ${id} doesn't exist!` },
-        { status: 404 }
-      );
-    }
+    return NextResponse.json(
+      { message: "Listing has been deleted successfully" },
+      { status: 200 }
+    );
   } catch (error: any) {
-    return NextApiResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

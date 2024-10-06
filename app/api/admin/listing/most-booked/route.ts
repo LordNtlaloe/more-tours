@@ -11,13 +11,13 @@ export async function GET(req: NextRequest) {
     // Type allListings as an array of listing objects
     const allListings = await db.listing.findMany({
       include: {
-        reservations: true,
+        bookings: true,
       },
     });
 
     // Find the most reserved listing
     const mostReservedListing = allListings.reduce((a, b) => {
-      return a?.reservations?.length >= b?.reservations?.length ? a : b;
+      return a?.bookings?.length >= b?.bookings?.length ? a : b;
     });
 
     return NextResponse.json(mostReservedListing);

@@ -1,29 +1,36 @@
-"use client"
-import Image from 'next/image'
-import person_image from '@/public/assets/img/testimonial/testi_2_1.png';
-import { format } from 'timeago.js'
-import { FaPen, FaTrash } from "react-icons/fa"
-import { useUserHook } from "../../../hooks/user-hook"
-import { AiOutlineArrowDown, AiOutlineArrowUp } from 'react-icons/ai'
-// import UserModal 
-import React, { useState } from 'react'
-import UserModal from '@/app/admin/modals/user-modal/UserModal'
+"use client";
+import Image from 'next/image';
+import { format } from 'timeago.js';
+import { FaPen, FaTrash } from "react-icons/fa";
+import { useUserHook } from "../../../hooks/user-hook";
+import { AiOutlineArrowDown, AiOutlineArrowUp } from 'react-icons/ai';
+import React, { useState } from 'react';
+import UserModal from '@/app/admin/modals/user-modal/UserModal';
 
 export const columns = [
     {
-        accessorKey: "profilePhoto",
-        header: "Profile Photo",
+        accessorKey: "image",
+        header: "User Image",
         cell: ({ row }) => {
+            const imageUrl = row.getValue("image");
             return (
-                <Image
-                    className="h-10 w-10 rounded-full object-cover"
-                    height="40"
-                    width="50"
-                    src={person_image}
-                    alt="Person's image"
-                />
-            )
-        }
+                <div className="h-12 w-12 relative rounded-full overflow-hidden">
+                    {imageUrl ? (
+                        <Image
+                            src={imageUrl}
+                            alt="User Image"
+                            layout="fill"
+                            objectFit="cover"
+                            className='rounded-full'
+                        />
+                    ) : (
+                        <div className="flex items-center justify-center h-full w-full bg-gray-300">
+                            No Image
+                        </div>
+                    )}
+                </div>
+            );
+        },
     },
     {
         accessorKey: "username",
@@ -43,7 +50,7 @@ export const columns = [
                         <AiOutlineArrowDown />
                     </span>
                 </button>
-            )
+            );
         },
     },
     {
@@ -51,7 +58,7 @@ export const columns = [
         header: ({ column }) => {
             return (
                 <button
-                    className="Flex items-center gap-1"
+                    className="flex items-center gap-1"
                     onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
                 >
                     Reservations
@@ -60,41 +67,30 @@ export const columns = [
                         <AiOutlineArrowDown />
                     </span>
                 </button>
-            )
+            );
         },
         cell: ({ row }) => {
-            const value = row.getValue("reservations")?.length || 0
-
-            return (
-                <div>
-                    {value} reservations
-                </div>
-            )
+            const value = row.getValue("reservations")?.length || 0;
+            return <div>{value} reservations</div>;
         }
     },
     {
         accessorKey: "createdAt",
         header: "Created At",
         cell: ({ row }) => {
-            const value = row.getValue("createdAt")
-            return (
-                <div>
-                    {format(value)}
-                </div>
-            )
+            const value = row.getValue("createdAt");
+            return <div>{format(value)}</div>;
         }
     },
     {
         accessorKey: "actions",
         header: "Actions",
         cell: ({ row }) => {
-            const { id: userId } = row.original
-            const [showModal, setShowModal] = useState(false)
-
-            const handleHideModal = () => setShowModal(false)
-            const handleShowModal = () => setShowModal(true)
-
-            const { handleDeleteUser, isPending } = useUserHook()
+            const { id: userId } = row.original;
+            const [showModal, setShowModal] = useState(false);
+            const handleHideModal = () => setShowModal(false);
+            const handleShowModal = () => setShowModal(true);
+            const { handleDeleteUser, isPending } = useUserHook();
 
             return (
                 <>
@@ -118,7 +114,7 @@ export const columns = [
                         />
                     )}
                 </>
-            )
+            );
         }
     },
-]
+];

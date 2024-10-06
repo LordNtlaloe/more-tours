@@ -32,7 +32,6 @@ export async function POST(req) {
             pricePerNight,
             beds,
             hasFreeWifi,
-            imageUrls
         } = body
 
         const newListing = await db.listing.create({
@@ -44,7 +43,6 @@ export async function POST(req) {
                 pricePerNight,
                 beds,
                 hasFreeWifi,
-                imageUrls
             }
         })
 

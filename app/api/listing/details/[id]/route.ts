@@ -11,7 +11,7 @@ export async function GET(req, ctx) {
             },
             include: {
                 reviews: true,
-                reservations: true
+                bookings: true
             }
         });
 

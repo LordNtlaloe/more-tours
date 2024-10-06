@@ -16,9 +16,7 @@ const LayoutProvider: React.FC<LayoutProviderProps> = ({ children }) => {
   return (
     <>
       <QueryClientProvider client={queryClient}>
-        {pathname !== "/login" && pathname !== "/signup" && !pathname.includes("/admin") && <Navbar />}
         {children}
-        {pathname !== "/login" && pathname !== "/signup" && !pathname.includes("/admin") && <Footer />}
       </QueryClientProvider>
     </>
   );
