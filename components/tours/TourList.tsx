@@ -1,6 +1,9 @@
 import React from 'react';
 import Image from 'next/image';
 import Loading from '@/app/loading';
+import BookAppointmentButton from './BookTourButton';
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '../ui/sheet';
+import TourBookingForm from '../booking/TourBookingForm';
 
 interface Tour {
     id: number;
@@ -64,9 +67,22 @@ export default function TourList({ tourList, title, loading }: TourProps) {
                                                 ))}
                                             </div>
                                             <p className="text-gray-700 mb-4">{tour.description}</p>
-                                            <div className="flex justify-between">
-                                                <a href={`/tour/${tour.id}`} className="bg-blue-600 text-white py-2 px-4 rounded transition duration-200 hover:bg-blue-700">Read More</a>
-                                                <a href={`/book/${tour.id}`} className="bg-blue-600 text-white py-2 px-4 rounded transition duration-200 hover:bg-blue-700">Book Now</a>
+                                            <div className="flex justify-between items-center">
+                                                <a href={`/tour/${tour.id}`} className="bg-blue-600 text-white py-2 px-4 rounded transition duration-200 hover:bg-blue-700 w-auto">Read More...</a>
+                                                <Sheet>
+                                                    <SheetTrigger className="w-auto my-3">
+                                                        <BookAppointmentButton tour={tour} />
+                                                    </SheetTrigger>
+                                                    <SheetContent className="bg-white overflow-auto">
+                                                        <SheetHeader>
+                                                            <SheetTitle className="bg-primary/30 p-3 text-center mt-8">Select Date and Time to book Service With Supplier</SheetTitle>
+                                                            <SheetDescription>
+                                                                <TourBookingForm id={tour.id.toString()} />
+                                                            </SheetDescription>
+                                                        </SheetHeader>
+
+                                                    </SheetContent>
+                                                </Sheet>
                                             </div>
                                         </div>
                                     </div>

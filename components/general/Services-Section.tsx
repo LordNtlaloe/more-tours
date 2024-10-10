@@ -17,7 +17,7 @@ export default function ServicesSection() {
                         { icon: FaHotel, title: "Quality", description: "Professional customer oriented consultation providing hassle free travel. Email capabilities for convenience and prompt booking and information. Creative but persistent approach to search for the most appropriate travel arrangements and identifying the best possible value." },
                         { icon: FaUser, title: "Value", description: "With our “Know How”, and as a sales agent for almost all major international airlines, we do not only offer competitive prices to our customer, but we are also able to pass on very competitive prices and a maximum opportunity for choices and flexibility we even offer a stress free luggage arrangement for our clients." },
                     ].map((service, index) => (
-                        <div key={index} className="lg:w-3/12 px-2 sm:w-6/12 mb-6 flex">
+                        <div key={index} className="lg:w-4/12 px-2 sm:w-6/12 mb-6 flex">
                             <div className="bg-white rounded-lg shadow-lg p-6 flex flex-col justify-between transition duration-300 ease-in-out hover:shadow-xl h-full">
                                 <div>
                                     <div className="text-blue-500 mb-4 text-4xl">

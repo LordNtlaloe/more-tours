@@ -13,7 +13,7 @@ import Link from "next/link";
 
 const SecondaryNav = () => {
   return (
-    <div className="bg-dark px-5 hidden lg:block">
+    <div className="bg-dark px-5 hidden lg:block border-b border-slate-100">
       <div className="grid grid-cols-2 gap-0">
         {/* Left Section with Contact Information */}
         <div className="text-center lg:text-left mb-2 lg:mb-0">

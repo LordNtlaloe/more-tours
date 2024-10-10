@@ -21,8 +21,8 @@ export const menuItems = [
   },
   {
     id: 4,
-    label: "Packages",
-    href: "/packages",
+    label: "Tours",
+    href: "/tours",
     icon: FiPackage,
   },
   {

@@ -1,13 +1,17 @@
 "use server"
 import { revalidatePath } from "next/cache";
 import { connectToDB } from "../_database/database";
+import { redirect } from "next/navigation";
+import { ObjectId } from "mongodb";
 
 // Initialize the Prisma connection
 let dbConnection: any;
+let database: any;
 
 const init = async () => {
     if (!dbConnection) {
-        dbConnection = await connectToDB();  // Fetch the Prisma client connection
+        dbConnection = await connectToDB();
+        database = await dbConnection?.db("pawreedy");
     }
 };
 
@@ -286,12 +290,12 @@ export const getTourCount = async () => {
     if (!dbConnection) await init();
 
     try {
-        // Use Prisma to count the number of businesses
+        // Use Prisma to count the number of tours
         const count = await dbConnection.tour.count();
 
         return { count };
     } catch (error: any) {
-        console.log("An error occurred getting business count...", error.message);
+        console.log("An error occurred getting tour count...", error.message);
         return { error: error.message };
     }
 };
@@ -324,7 +328,7 @@ export const hasUserBookedTour = async (userId: string, tourId: string) => {
     if (!dbConnection) await init();
 
     try {
-        // Check if a booking exists for the user and business using Prisma
+        // Check if a booking exists for the user and tour using Prisma
         const booking = await dbConnection.booking.findFirst({
             where: {
                 userId: userId,
@@ -343,7 +347,7 @@ export const getUserRatingCount = async (userId: string, tourId: string) => {
     if (!dbConnection) await init();
   
     try {
-      // Use Prisma to count ratings for the user and business
+      // Use Prisma to count ratings for the user and tour
       const ratingCount = await dbConnection.rating.count({
         where: {
           userId: userId,
@@ -357,3 +361,28 @@ export const getUserRatingCount = async (userId: string, tourId: string) => {
       return { error: error.message };
     }
   };
+
+  export const updateTourStatus = async (_id: string, newStatus: string) => {
+    if (!dbConnection) await init();
+  
+    let result;
+  
+    try {
+      const collection = await database?.collection("tours");
+  
+      if (!database || !collection) {
+        console.log("Failed to connect to collection..");
+        return;
+      }
+  
+      result = await collection.updateOne({ "_id": new ObjectId(_id) }, { $set: { status: newStatus } });
+      revalidatePath('/dashboard/tours');
+    } catch (error: any) {
+      return { "ERROR": error.message };
+    }
+  
+    if (result) {
+      return redirect('/dashboard/tours');
+    }
+  };
+  
