@@ -1,9 +1,23 @@
-import React from 'react'
+import DashboardHeader from "@/components/dashboard/DashboardHeader";
+import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
+import DashboardSummary from "@/components/dashboard/DashboardSummary";
+import React from "react";
 
-export default function DashboardLayout() {
+const layout = ({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) => {
   return (
-    <div>
-      
-    </div>
-  )
-}
+    <main className="flex w-full">
+      <DashboardSidebar />
+      <div className="w-full bg-slate-100 px-2">
+        <DashboardHeader />
+        <DashboardSummary />
+        <div className="mt-2 p-2 rounded mb-3">{children}</div>
+      </div>
+    </main>
+  );
+};
+
+export default layout;

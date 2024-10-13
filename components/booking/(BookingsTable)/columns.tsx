@@ -12,9 +12,13 @@ import UpdateBookingtButton from "./BookingsActions/UpdateBookingsButton";
 
 export type Booking = {
   tour: any;
-  _id: string;
-  name: string;
-  icon: string
+  id: string;
+  userId: string;
+  tourId: string;
+  numberOfPeople: number;
+  status: string;
+  totalPrice:string;
+  bookingDate:string;
   options: "update" | "delete";
 };
 
@@ -22,44 +26,44 @@ export type Booking = {
 export const columns: ColumnDef<Booking>[] = [
 
     {
-        accessorKey: "fullName",
-        header: "Name",
+        accessorKey: "id",
+        header: "ID",
     },
     {
-        accessorKey: "tourName",
-        header: "Tour Name",
+        accessorKey: "userId",
+        header: "User ID",
     },
     {
-        accessorKey: "dateBooked",
-        header: "Date Booked",
+        accessorKey: "tourId",
+        header: "Tour ID",
     },
     {
-        accessorKey: "timeSlotBooked",
-        header: "Time Slot",
+        accessorKey: "numberOfPeople",
+        header: "Number Of People",
     },
     {
-        accessorKey: "dateOfBooking",
-        header: "Date of Booking",
-    },
-    {
-        accessorKey: "timeOfBooking",
-        header: "Time of Booking",
-    },
-    {
-        accessorKey: "bookingStatus",
+        accessorKey: "status",
         header: "Booking Status",
     },
     {
+        accessorKey: "totalPrice",
+        header: "Total Price",
+    },
+    {
+        accessorKey: "bookingDate",
+        header: "Tour Date",
+    },
+    {
 
-    accessorKey: "_id",
+    accessorKey: "id",
     header: "OPTIONS",
     cell: ({ row }) => {
       const booking = row.original
 
       return (
         <div className="flex gap-2 items-center">
-          <UpdateBookingtButton bookingID={booking._id} />
-          <Link href={'/dashboard/bookings/delete/?id=' + booking._id}>
+          <UpdateBookingtButton bookingID={booking.id} />
+          <Link href={'/dashboard/bookings/delete/?id=' + booking.id}>
             <button type="button" className="bg-red-600 text-white px-3 p-1 rounded-2xl hover:bg-red-800" >
               Delete
             </button>

@@ -12,7 +12,7 @@ const init = async () => {
 
 export const saveNewTourBooking = async (formData: FormData) => {
 
-    if (!dbConnection) await init();
+    if (!dbConnection) if (!dbConnection) await init();
 
     const data = {
         userId: formData.get("userId") as string,
@@ -58,7 +58,7 @@ export const saveNewTourBooking = async (formData: FormData) => {
 
 
 export const getBookingById = async (bookingId: string) => {
-    await init();
+    if (!dbConnection) if (!dbConnection) await init();
 
     try {
         const booking = await dbConnection.booking.findUnique({
@@ -85,7 +85,7 @@ export const getBookingById = async (bookingId: string) => {
 };
 
 export const getTourBookedSlots = async (tourId: string, date: string) => {
-    await init();
+    if (!dbConnection) if (!dbConnection) await init();
 
     try {
         const bookings = await dbConnection.booking.findMany({
@@ -105,32 +105,50 @@ export const getTourBookedSlots = async (tourId: string, date: string) => {
 };
 
 export const getAllBookings = async () => {
-    await init();
-
+    if (!dbConnection) await init();
+  
     try {
-        const bookings = await dbConnection.booking.findMany({
-            include: {
-                user: { select: { firstName: true } },
-                tour: { select: { tourName: true } },
-            },
-            orderBy: { createdAt: 'desc' },
-        });
-
-        return bookings.map((booking: { id: any; dateBooked: any; timeSlotBooked: any; user: { firstName: any; }; tour: { businessName: any; }; }) => ({
-            id: booking.id,
-            dateBooked: booking.dateBooked,
-            timeSlotBooked: booking.timeSlotBooked,
-            userName: booking.user.firstName,
-            tourName: booking.tour.businessName,
-        }));
+      const bookings = await dbConnection.booking.findMany({
+        include: {
+          user: { select: { name: true } }, // Fetching user details
+          tour: { 
+            select: { 
+              title: true, 
+              destination: true, 
+              price: true,
+              startDate: true,
+              endDate: true
+            } 
+          }, // Fetching tour details
+        },
+        orderBy: { dateBooked: 'desc' }, // Sorting by booking date
+      });
+  
+      return bookings.map((booking: { id: any; dateBooked: any; user: { name: any; }; tour: { title: any; destination: any; price: any; numberOfPeople: any; startDate: any; endDate: any; }; status: any; totalPrice: any; bookingDate: any; numberOfPeople: any; }) => ({
+        id: booking.id,
+        dateBooked: booking.dateBooked,
+        userId: booking.user.name, // Display user's name
+        tour: {
+          title: booking.tour.title,
+          destination: booking.tour.destination,
+          price: booking.tour.price,
+          startDate: booking.tour.startDate,
+          endDate: booking.tour.endDate
+        },
+        status: booking.status,
+        totalPrice: booking.totalPrice,
+        bookingDate: booking.bookingDate,
+        numberOfPeople: booking.numberOfPeople
+      }));
     } catch (error: any) {
-        console.error("An error occurred while fetching bookings:", error.message);
-        return { error: error.message };
+      console.error("An error occurred while fetching bookings:", error.message);
+      return [];
     }
-};
+  };
+
 
 export const getBookingsCountByTodayDate = async () => {
-    await init();
+    if (!dbConnection) await init();
 
     try {
         const currentDate = new Date().toLocaleDateString();
@@ -147,7 +165,7 @@ export const getBookingsCountByTodayDate = async () => {
 };
 
 export const deleteOneBooking = async (bookingId: string) => {
-    await init();
+    if (!dbConnection) await init();
 
     try {
         const deleted = await dbConnection.booking.delete({

@@ -57,8 +57,8 @@ export const dashboardMenu = [
   },
   {
     id: 2,
-    label: "Businesses",
-    href: "/dashboard/businesses",
+    label: "Tours",
+    href: "/dashboard/tours",
     icon: FiBriefcase,
     color: '#39F4B3'
   },
