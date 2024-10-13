@@ -3,99 +3,95 @@ import { Calendar } from "@/components/ui/calendar";
 import { Button } from '@/components/ui/button';
 import { SheetClose, SheetFooter } from '@/components/ui/sheet';
 import { showToastMessage } from '@/lib/generalFunctions';
-import { getTourBookedSlots, saveNewTourBooking } from '@/app/_actions/_tourBookingActions';
 import { useClerk } from '@clerk/nextjs';
 import { sendMail } from '@/app/_email/_mail';
+import { saveNewTourBooking } from '@/app/_actions/_tourBookingActions';
 
-const TourBookingForm = ({ id }: { id: string }) => {
+const TourBookingForm = ({ id, tourPrice, tourName }: { id: string, tourPrice: number, tourName: string }) => {
     const [date, setDate] = useState<Date | undefined>(new Date());
-    const [timeSlot, setTimeSlot] = useState<string[]>([]);
-    const [selectedTime, setSelectedTime] = useState<string>('8:00');
-    const [bookedSlots, setBookedSlots] = useState<string[]>([]);
+    const [numberOfPeople, setNumberOfPeople] = useState<number>(1);
+    const [totalPrice, setTotalPrice] = useState<number>(tourPrice); // Initialize with tour price
+    const [bookedDates, setBookedDates] = useState<string[]>([]);
     const { user } = useClerk();
     const userId = user?.id;
     const userEmail = user?.primaryEmailAddress?.emailAddress;
-
+    console.log(userEmail);
     useEffect(() => {
         if (date) {
-            getTime();
-            getBookedSlots();
+            getBookedDates();
         }
     }, [date]);
 
-    const getBookedSlots = async () => {
-        if (date) {
-            const formattedDate = date.toISOString().split('T')[0];
-            const bookedSlotsResponse = await getTourBookedSlots(id, formattedDate);
-            if (bookedSlotsResponse && !bookedSlotsResponse.error) {
-                setBookedSlots(bookedSlotsResponse);
-            }
-        }
+    useEffect(() => {
+        calculateTotalPrice(); // Recalculate total price whenever number of people changes
+    }, [numberOfPeople]);
+
+    const getBookedDates = () => {
+        const storedBookings = JSON.parse(localStorage.getItem('bookings') || '[]');
+        const formattedDate = date?.toISOString().split('T')[0];  // Extract date part
+        const bookedSlots = storedBookings.filter((booking: any) => booking.dateBooked === formattedDate);
+        const dates = bookedSlots.map((booking: any) => booking.dateBooked);
+        setBookedDates(dates);
     };
 
-    const saveTourBooking = async () => {
-        if (!date || !selectedTime || !userId || !userEmail) return;
+    const calculateTotalPrice = () => {
+        if (numberOfPeople <= 0) return;
 
+        let price = tourPrice; // Start with full tour price
+        if (numberOfPeople > 1) {
+            price += (numberOfPeople - 1) * (tourPrice / 2); // Half price for additional people
+        }
+        setTotalPrice(price);
+    };
+
+    const saveBooking = async () => {
+        if (!date || numberOfPeople <= 0 || !userId || !userEmail) return;
+    
         const formData = new FormData();
-        formData.append("tourId", id);
+        const formattedDate = date.toISOString();  // Convert to full ISO string
         formData.append("userId", userId);
-        formData.append("dateBooked", date.toISOString().split('T')[0]);
-        formData.append("timeSlotBooked", selectedTime);
-
+        formData.append("tourId", id);
+        formData.append("bookingDate", formattedDate);  
+        formData.append("numberOfPeople", numberOfPeople.toString());
+        formData.append("totalPrice", totalPrice.toString());
+    
         const result = await saveNewTourBooking(formData);
+        
         if (result.error) {
             showToastMessage("error", result.error);
         } else {
+            try {
+                
+                await sendMail({
+                    to: userEmail,
+                    name: user?.firstName || 'User',
+                    subject: 'Booking Confirmation',
+                    body: `<p>Dear ${user?.firstName},</p>
+                            <p>Your booking for ${tourName} on ${date?.toLocaleDateString()} for ${numberOfPeople} people has been confirmed.</p>
+                            <p>Total Price: $${totalPrice.toFixed(2)}</p>
+                            <p>Thank you!</p>`,
+                });
+            } catch (error) {
+                console.error("Error sending confirmation email:", error);
+                showToastMessage("error", "Error sending confirmation email.");
+            }
             showToastMessage("success", "Your booking has been confirmed.");
-            await sendMail({
-                to: userEmail,
-                name: user?.firstName || 'User',
-                subject: 'Booking Confirmation',
-                body: `<p>Dear ${user?.firstName},</p><p>Your booking for ${date.toLocaleDateString()} at ${selectedTime} has been confirmed.</p><p>Thank you!</p>`
-            });
-            getBookedSlots();
+            getBookedDates();
         }
     };
-
-    const getTime = () => {
-        const timeList: string[] = [];
-        for (let i = 8; i < 18; i++) {
-            timeList.push(`${i}:00`);
-            timeList.push(`${i}:30`);
-        }
-        setTimeSlot(timeList);
-    };
-
-    const handleTimeSlotClick = (slot: string) => {
-        if (bookedSlots.includes(slot)) {
-            showToastMessage("error", "This time slot is already booked.");
-        } else {
-            setSelectedTime(slot);
-        }
-    };
-
+    
     const isPastDate = (date: Date) => {
         const today = new Date();
-        today.setHours(0, 0, 0, 0);
+        today.setHours(0, 0, 0, 0);  // Reset time to midnight
         return date < today;
-    };
-
-    const isPastTimeSlot = (slot: string) => {
-        if (date && date.toDateString() === new Date().toDateString()) {
-            const [hours, minutes] = slot.split(':').map(Number);
-            const selectedDateTime = new Date(date);
-            selectedDateTime.setHours(hours, minutes, 0, 0);
-            return selectedDateTime < new Date();
-        }
-        return false;
     };
 
     return (
         <main>
             {date !== undefined && (
-                <form onSubmit={(e) => { e.preventDefault(); saveTourBooking(); }}>
+                <form onSubmit={(e) => { e.preventDefault(); saveBooking(); }}>
                     <h2 className='mt-4 pb-2 mb-4 font-semibold'>
-                        Select Date: <span className='bg-primary px-4 py-1 rounded'>{date && date.toLocaleDateString()}</span>
+                        Select Date: <span className='bg-primary px-4 py-1 rounded'>{date.toLocaleDateString()}</span>
                     </h2>
                     <div>
                         <Calendar
@@ -108,27 +104,32 @@ const TourBookingForm = ({ id }: { id: string }) => {
                     </div>
 
                     <h2 className='mt-4 pb-2 border-b mb-4 font-semibold'>
-                        Select Time Slot: <span className='bg-primary px-4 py-1 rounded'>{selectedTime}</span>
+                        Number of People: 
+                        <span className='bg-primary px-4 py-1 rounded'>
+                            {numberOfPeople}
+                        </span>
                     </h2>
-                    <div className='grid grid-cols-3 gap-3'>
-                        {timeSlot.map((slot: string, index: number) => (
-                            <Button
-                                key={index}
-                                className={`rounded-full p-2 px-3 border-2 hover:bg-primary bg-white border-primary hover:text-white ${bookedSlots.includes(slot) || isPastTimeSlot(slot) ? 'bg-gray-400 cursor-not-allowed' : ''}`}
-                                disabled={bookedSlots.includes(slot) || isPastTimeSlot(slot)}
-                                onClick={() => handleTimeSlotClick(slot)}
-                            >
-                                {slot}
-                            </Button>
-                        ))}
+                    <div className='mb-4'>
+                        <input
+                            type="number"
+                            value={numberOfPeople}
+                            min={1}
+                            onChange={(e) => setNumberOfPeople(Number(e.target.value))}
+                            className="border rounded px-4 py-2 w-full"
+                            placeholder="Enter number of people"
+                        />
                     </div>
+
+                    <h2 className='mt-4 pb-2 border-b mb-4 font-semibold'>
+                        Total Price: <span className='bg-primary px-4 py-1 rounded'>${totalPrice.toFixed(2)}</span>
+                    </h2>
 
                     <SheetFooter>
                         <SheetClose>
                             <div className="grid grid-cols-2 gap-3 p-4 border-t mt-3 w-full justify-end bg-primary/30">
                                 <Button
                                     type='submit'
-                                    disabled={!selectedTime || bookedSlots.includes(selectedTime) || (date && isPastDate(date))}
+                                    disabled={isPastDate(date) || numberOfPeople <= 0}
                                     className="bg-blue-700 text-white rounded py-1 hover:bg-blue-500"
                                 >
                                     Book
@@ -136,7 +137,10 @@ const TourBookingForm = ({ id }: { id: string }) => {
                                 <Button
                                     type='button'
                                     className="bg-red-500 text-white rounded py-1 hover:bg-red-800"
-                                    onClick={() => setSelectedTime('')}
+                                    onClick={() => {
+                                        setNumberOfPeople(1);
+                                        setTotalPrice(tourPrice);
+                                    }}
                                 >
                                     Close
                                 </Button>

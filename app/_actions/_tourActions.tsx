@@ -6,12 +6,10 @@ import { ObjectId } from "mongodb";
 
 // Initialize the Prisma connection
 let dbConnection: any;
-let database: any;
 
 const init = async () => {
     if (!dbConnection) {
         dbConnection = await connectToDB();
-        database = await dbConnection?.db("pawreedy");
     }
 };
 
@@ -345,44 +343,35 @@ export const hasUserBookedTour = async (userId: string, tourId: string) => {
 
 export const getUserRatingCount = async (userId: string, tourId: string) => {
     if (!dbConnection) await init();
-  
-    try {
-      // Use Prisma to count ratings for the user and tour
-      const ratingCount = await dbConnection.rating.count({
-        where: {
-          userId: userId,
-          tourId: tourId, // Adjust based on your schema if necessary
-        },
-      });
-  
-      return ratingCount; // Return the count
-    } catch (error: any) {
-      console.log("An error occurred getting user rating count...", error.message);
-      return { error: error.message };
-    }
-  };
 
-  export const updateTourStatus = async (_id: string, newStatus: string) => {
-    if (!dbConnection) await init();
-  
-    let result;
-  
     try {
-      const collection = await database?.collection("tours");
-  
-      if (!database || !collection) {
-        console.log("Failed to connect to collection..");
-        return;
-      }
-  
-      result = await collection.updateOne({ "_id": new ObjectId(_id) }, { $set: { status: newStatus } });
-      revalidatePath('/dashboard/tours');
+        // Use Prisma to count ratings for the user and tour
+        const ratingCount = await dbConnection.rating.count({
+            where: {
+                userId: userId,
+                tourId: tourId, // Adjust based on your schema if necessary
+            },
+        });
+
+        return ratingCount; // Return the count
     } catch (error: any) {
-      return { "ERROR": error.message };
+        console.log("An error occurred getting user rating count...", error.message);
+        return { error: error.message };
     }
-  
-    if (result) {
-      return redirect('/dashboard/tours');
+};
+
+export const updateTourStatus = async (id: string, newStatus: string) => {
+    if (!dbConnection) await init();
+    try {
+        // Ensure the tour exists and update its status using Prisma
+        const updatedTour = await dbConnection.tour.update({
+            where: { id: Number(id) }, // Assuming `id` is a number. If it's a string, adjust accordingly.
+            data: { status: newStatus }, // Ensure your `Tour` model has a `status` field
+        });
+
+        return updatedTour;
+    } catch (error: any) {
+        console.error("Error updating tour status:", error.message);
+        return { error: error.message };
     }
-  };
-  
+};

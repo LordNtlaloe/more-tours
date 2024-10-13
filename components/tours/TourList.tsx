@@ -77,7 +77,7 @@ export default function TourList({ tourList, title, loading }: TourProps) {
                                                         <SheetHeader>
                                                             <SheetTitle className="bg-primary/30 p-3 text-center mt-8">Select Date and Time to book Service With Supplier</SheetTitle>
                                                             <SheetDescription>
-                                                                <TourBookingForm id={tour.id.toString()} />
+                                                                <TourBookingForm id={tour.id.toString()} tourPrice={tour.price} tourName={tour.title} />
                                                             </SheetDescription>
                                                         </SheetHeader>
 

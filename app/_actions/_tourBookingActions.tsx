@@ -2,268 +2,161 @@
 
 import { revalidatePath } from "next/cache";
 import { connectToDB } from "../_database/database";
-import { ObjectId } from "mongodb";
 
 let dbConnection: any;
-let database: any;
 
 const init = async () => {
     const connection = await connectToDB();
     dbConnection = connection;
 };
 
-export const getBookingById = async (bookingId: string) => {
+export const saveNewTourBooking = async (formData: FormData) => {
+
     if (!dbConnection) await init();
 
+    const data = {
+        userId: formData.get("userId") as string,
+        tourId: Number(formData.get("tourId")),
+        dateBooked: new Date(),
+        bookingDate:formData.get("bookingDate") as string,
+        bookingStatus: "PENDING",
+        numberOfPeople: Number(formData.get("numberOfPeople")),
+        totalPrice: parseFloat(formData.get("totalPrice") as string)
+    };
+
     try {
-        const collection = database.collection("bookings");
-        if (!collection) {
-            throw new Error("Failed to connect to bookings collection");
+        const userBookingOnSameDay = await dbConnection.booking.findFirst({
+            where: {
+                userId: data.userId,
+                dateBooked: data.dateBooked,
+            },
+        });
+
+        if (userBookingOnSameDay) {
+            return { error: "You have already made a booking for today. Multiple bookings on the same day are not allowed." };
         }
 
-        const booking = await collection.aggregate([
-            {
-                $match: { _id: new ObjectId(bookingId) }
+        const newBooking = await dbConnection.booking.create({
+            data: {
+                userId: data.userId,
+                tourId: data.tourId,
+                numberOfPeople: data.numberOfPeople,
+                status: data.bookingStatus,
+                totalPrice: data.totalPrice,
+                dateBooked: data.dateBooked,
+                bookingDate: data.bookingDate,
             },
-            {
-                $lookup: {
-                    from: "users",
-                    localField: "userId",
-                    foreignField: "_id",
-                    as: "user"
-                }
-            },
-            {
-                $lookup: {
-                    from: "toures",
-                    localField: "tourId",
-                    foreignField: "_id",
-                    as: "tour"
-                }
-            },
-            {
-                $project: {
-                    _id: 1,
-                    dateBooked: 1,
-                    timeSlotBooked: 1,
-                    dateOfBooking: 1,
-                    timeOfBooking: 1,
-                    bookingStatus: 1,
-                    userName: { $arrayElemAt: ["$user.firstName", 0] },
-                    tourName: { $arrayElemAt: ["$tour.tourName", 0] }
-                }
-            }
-        ]).toArray();
+        });
+        console.log(data);
+        revalidatePath('/dashboard/mybookings');
+        return { bookingId: newBooking.id };
+    } catch (error: any) {
+        console.log("An error occurred while creating a new booking:", error.message);
+        return { error: error.message };
+    }
+};
 
-        if (booking.length === 0) {
+
+export const getBookingById = async (bookingId: string) => {
+    await init();
+
+    try {
+        const booking = await dbConnection.booking.findUnique({
+            where: { id: bookingId },
+            include: {
+                user: { select: { firstName: true } },
+                tour: { select: { tourName: true } },
+            },
+        });
+
+        if (!booking) {
             return { error: "Booking not found" };
         }
 
-        return booking[0];
+        return {
+            ...booking,
+            userName: booking.user.firstName,
+            tourName: booking.tour.tourName,
+        };
     } catch (error: any) {
         console.error("An error occurred while fetching the booking:", error.message);
         return { error: error.message };
     }
 };
 
-
-export const saveNewTourBooking = async (formData: FormData) => {
-  const userId = formData.get("userId") as string;
-  const tourId = formData.get("tourId") as string;
-  const dateBooked = formData.get('dateBooked') as string;
-  const timeSlotBooked = formData.get('timeSlotBooked') as string;
-
-  const data = {
-      userId: userId,
-      tourId: new ObjectId(tourId),
-      dateBooked,
-      timeSlotBooked,
-      dateOfBooking: new Date().toLocaleDateString(),
-      timeOfBooking: new Date().toLocaleTimeString(),
-      bookingStatus: "pending"
-  };
-
-  if (!dbConnection) await init();
-
-  try {
-      const collection = await database.collection("bookings");
-
-      if (!collection || !database) {
-          return { error: "Failed to connect to collection BOOKINGS!!" };
-      }
-
-      const selectedDateTime = new Date(`${dateBooked}T${timeSlotBooked}`);
-      const currentDateTime = new Date();
-
-      if (selectedDateTime <= currentDateTime) {
-          return { error: "Cannot book for a past or current time." };
-      }
-
-      const existingBooking = await collection.findOne({
-          dateBooked,
-          timeSlotBooked
-      });
-
-      if (existingBooking) {
-          return { error: "This time slot is already booked. Please choose another time." };
-      }
-      
-      const userBookingOnSameDay = await collection.findOne({
-          userId,
-          dateBooked
-      });
-
-      if (userBookingOnSameDay) {
-          return { error: "You have already made a booking for today. Multiple bookings on the same day are not allowed." };
-      }
-
-      const newBooking = await collection.insertOne(data);
-      revalidatePath('/dashboard/mybookings');
-      return { bookingId: newBooking.insertedId };
-  } catch (error: any) {
-      console.log("An error occurred saving new booking:", error.message);
-      return { error: error.message };
-  }
-};
-
-
 export const getTourBookedSlots = async (tourId: string, date: string) => {
-  if (!dbConnection) await init();
+    await init();
 
-  try {
-      const collection = await database?.collection("bookings");
+    try {
+        const bookings = await dbConnection.booking.findMany({
+            where: {
+                tourId: tourId,
+                dateBooked: date,
+            },
+            select: { timeSlotBooked: true },
+        });
 
-      if (!database || !collection) {
-          console.log("Failed to connect to collection..");
-          return { error: "Failed to connect to collection" };
-      }
-
-      const bookings = await collection
-          .find({ tourId: new ObjectId(tourId), dateBooked: date })
-          .toArray();
-
-      const bookedSlots = bookings.map((booking: { timeSlotBooked: any; }) => booking.timeSlotBooked);
-      return bookedSlots;
-
-  } catch (error: any) {
-      console.log("GET BOOKED SLOTS:", error.message);
-      return { "error": error.message };
-  }
+        const bookedSlots = bookings.map((booking: { timeSlotBooked: any; }) => booking.timeSlotBooked);
+        return bookedSlots;
+    } catch (error: any) {
+        console.log("GET BOOKED SLOTS:", error.message);
+        return { error: error.message };
+    }
 };
-
 
 export const getAllBookings = async () => {
-  try {
-      if (!dbConnection) await init();
+    await init();
 
-      const collection = database.collection("bookings");
-      if (!collection) {
-          throw new Error("Failed to connect to bookings collection");
-      }
+    try {
+        const bookings = await dbConnection.booking.findMany({
+            include: {
+                user: { select: { firstName: true } },
+                tour: { select: { tourName: true } },
+            },
+            orderBy: { createdAt: 'desc' },
+        });
 
-      const bookings = await collection.aggregate([
-          {
-              $lookup: {
-                  from: "users",
-                  localField: "userId",
-                  foreignField: "_id",
-                  as: "user"
-              }
-          },
-          {
-              $lookup: {
-                  from: "toures",
-                  localField: "tourId",
-                  foreignField: "_id",
-                  as: "tour"
-              }
-          },
-          {
-              $project: {
-                  _id: 1,
-                  dateBooked: 1,
-                  timeSlotBooked: 1,
-                  dateOfBooking: 1,
-                  timeOfBooking: 1,
-                  bookingStatus: 1,
-                  name: { $arrayElemAt: ["$user.firstName", 0] },
-                  tourName: { $arrayElemAt: ["$tour.name", 0] }
-              }
-          }
-      ]).toArray();
-
-      console.log("Bookings after lookup and projection:", bookings);
-
-      return bookings;
-  } catch (error: any) {
-      console.error("An error occurred while fetching bookings:", error.message);
-      return { error: error.message };
-  }
+        return bookings.map((booking: { id: any; dateBooked: any; timeSlotBooked: any; user: { firstName: any; }; tour: { businessName: any; }; }) => ({
+            id: booking.id,
+            dateBooked: booking.dateBooked,
+            timeSlotBooked: booking.timeSlotBooked,
+            userName: booking.user.firstName,
+            tourName: booking.tour.businessName,
+        }));
+    } catch (error: any) {
+        console.error("An error occurred while fetching bookings:", error.message);
+        return { error: error.message };
+    }
 };
-
 
 export const getBookingsCountByTodayDate = async () => {
-  try {
-    if (!dbConnection) await init();
+    await init();
 
-    const collection = database.collection("bookings");
-    if (!collection) {
-      throw new Error("Failed to connect to bookings collection");
+    try {
+        const currentDate = new Date().toLocaleDateString();
+
+        const bookingsCount = await dbConnection.booking.count({
+            where: { dateBooked: currentDate },
+        });
+
+        return bookingsCount;
+    } catch (error: any) {
+        console.error("An error occurred while fetching bookings count for today:", error.message);
+        return { error: error.message };
     }
-
-    const currentDate = new Date().toLocaleDateString();
-
-    const bookingsCount = await collection
-      .aggregate([
-        {
-          $match: {
-            dateBooked: currentDate
-          }
-        },
-        {
-          $count: "count"
-        }
-      ])
-      .toArray();
-
-    if (bookingsCount.length > 0) {
-      return bookingsCount[0].count; 
-    } else {
-      return 0; 
-    }
-  } catch (error: any) {
-    console.error("An error occurred while fetching bookings count for today:", error.message);
-    return { error: error.message };
-  }
 };
 
-export const deleteOneBooking = async (_id: string) => {
-  if (!dbConnection) await init();
+export const deleteOneBooking = async (bookingId: string) => {
+    await init();
 
-  try {
-
-    const collection = await database?.collection("bookings");
-
-    if (!database || !collection) {
-      console.log("Failed to connect to collection..");
-      return;
+    try {
+        const deleted = await dbConnection.booking.delete({
+            where: { id: bookingId },
+        });
+        revalidatePath('/dashboard/bookings');
+        return deleted;
+    } catch (error: any) {
+        console.log("An error occurred while deleting the booking:", error.message);
+        return { error: error.message };
     }
-
-    const deleted = await collection
-      .deleteOne({ "_id": new ObjectId(_id) });
-    revalidatePath('/dashboard/bookings');
-    return deleted;
-  } catch (error: any) {
-    console.log("An error occured...", error.message);
-    return { error: error.message };
-  }
 };
-
-
-
-
-
-
-
-
-

@@ -40,15 +40,36 @@ export const saveNewUser = async (formData: FormData) => {
     }
 };
 
-// Create a new user from Clerk
-export const createNewUserFromClerk = async (user: any) => {
+// Create or update a user from Clerk
+export const createOrUpdateUserFromClerk = async (clerkUser: any) => {
     await init();
 
+    const userData = {
+        clerkId: clerkUser.id, // Store the Clerk user ID
+        email: clerkUser.emailAddresses[0]?.emailAddress, // Assuming there's at least one email
+        name: clerkUser.firstName,
+        surname: clerkUser.lastName,
+        phoneNumber: clerkUser.phoneNumbers[0]?.phoneNumber || null, // Optional
+    };
+
     try {
-        const newUser = await dbConnection.user.create({ data: user });
-        return newUser;
+        // Check if user already exists
+        const existingUser = await dbConnection.user.findUnique({
+            where: { clerkId: clerkUser.id },
+        });
+
+        if (existingUser) {
+            // Update existing user
+            return await dbConnection.user.update({
+                where: { clerkId: clerkUser.id },
+                data: userData,
+            });
+        } else {
+            // Create new user
+            return await dbConnection.user.create({ data: userData });
+        }
     } catch (error: any) {
-        console.log("An error occurred saving new user:", error.message);
+        console.log("An error occurred saving or updating user:", error.message);
         return { error: error.message };
     }
 };
