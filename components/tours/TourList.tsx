@@ -68,7 +68,7 @@ export default function TourList({ tourList, title, loading }: TourProps) {
                                             </div>
                                             <p className="text-gray-700 mb-4">{tour.description}</p>
                                             <div className="flex justify-between items-center">
-                                                <a href={`/tour/${tour.id}`} className="bg-blue-600 text-white py-2 px-4 rounded transition duration-200 hover:bg-blue-700 w-auto">Read More...</a>
+                                                <a href={`/tours/${tour.id}`} className="bg-blue-600 text-white py-2 px-4 rounded transition duration-200 hover:bg-blue-700 w-auto">Read More...</a>
                                                 <Sheet>
                                                     <SheetTrigger className="w-auto my-3">
                                                         <BookAppointmentButton tour={tour} />

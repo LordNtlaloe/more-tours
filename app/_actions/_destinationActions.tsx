@@ -73,7 +73,7 @@ export const deleteOneDestination = async (id: string) => {
 };
 
 // Update the name of a destination (no change to related tours)
-export const updateDestination = async (id: string, newName: string) => {
+export const updateDestination = async (id: string, newName: string, p0: string) => {
   await init();
 
   try {

@@ -116,27 +116,30 @@ export const getAllToursByCategory = async (category_name: string) => {
 };
 
 
-export const getTourById = async (id: string) => {
+export const getTourById = async (id: number) => {
     if (!dbConnection) await init();
 
     try {
         let tour = await dbConnection.tour.findUnique({
             where: {
                 id: id
+            },
+            include: {
+                destination: true,
+                category: true
             }
         });
 
+        // Fix the typo in `toString`
         if (tour) {
-            tour = { ...tour, id: tour.id.toSting() }
+            tour = { ...tour, id: tour.id.toString() };
         }
         return tour;
+    } catch (error: any) {
+        console.log("An error occurred...", error.message);
+        return { error: error.message };
     }
-    catch (error: any) {
-        console.log("An error occured...", error.message);
-        return { "error": error.message }
-    }
-
-}
+};
 
 export const getTourByName = async (name: string) => {
     if (!dbConnection) await init();

@@ -83,4 +83,18 @@ export const dashboardMenu = [
     icon: FiUsers,
     color: '#39F4B3'
   },
+  {
+    id: 6,
+    label: "Destinations",
+    href: "/dashboard/destinations",
+    icon: FiUsers,
+    color: '#39F4B3'
+  },
+  {
+    id: 7,
+    label: "Reviews",
+    href: "/dashboard/reviews",
+    icon: FiUsers,
+    color: '#39F4B3'
+  },
 ];

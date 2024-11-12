@@ -1,7 +1,6 @@
 "use client"
 import React, { useState } from 'react';
-import { SignIn, SignInButton, SignOutButton, useAuth, useSignIn } from '@clerk/nextjs';
-import type { NextPage } from 'next';
+import { useAuth, useSignIn } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
@@ -22,11 +21,9 @@ const PasswordResetPage = () => {
         return null;
     }
 
-    // If the user is already signed in,
-    // redirect them to the home page
-    // if (isSignedIn) {
-    //     router.push('/');
-    // }
+    if (isSignedIn) {
+        router.push('/');
+    }
 
     // Send the password reset code to the user's email
     async function create(e: React.FormEvent) {
